@@ -1,6 +1,6 @@
 # Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach
 
-This repository contains the code and supplementary data for the MSc thesis *"Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach"* (JADS, 2025). The pipeline performs large-scale sentiment analysis and frame detection on a corpus of ~25,000 Dutch newspaper articles from Algemeen Dagblad, De Telegraaf, and de Volkskrant.
+This repository contains the code and supplementary data for the MSc thesis *"Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach"* (Şeref, 2026). The pipeline performs large-scale sentiment analysis and frame detection on a corpus of ~25,000 Dutch newspaper articles from Algemeen Dagblad, De Telegraaf, and de Volkskrant.
 
 ## Research Questions
 
@@ -28,9 +28,9 @@ This repository contains the code and supplementary data for the MSc thesis *"Un
 ├── Output/                           # Generated figures and plots
 │
 └── Data/                             # Processed data files (see note below)
-    ├── df_with_topics.csv            # Topic assignments per article (text columns removed)
-    ├── uniform_sentiment_analysis.csv # Sentiment scores per article (text columns removed)
-    ├── aspect_sentiment_by_drugclass.csv # ABSA scores per drug class (text columns removed)
+    ├── df_with_topics.csv            # Topic assignments per article 
+    ├── uniform_sentiment_analysis.csv # Sentiment scores per article 
+    ├── aspect_sentiment_by_drugclass.csv # ABSA scores per drug class
     └── comparison_sample.csv         # Comparative outlet analysis output
 ```
 
@@ -69,4 +69,4 @@ The pipeline was executed on the TU/e High Performance Computing cluster. Key de
 
 If you use this code, please cite the thesis:
 
-> Seref, S. (2025). *Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach*. MSc Thesis, Jheronimus Academy of Data Science.
+> Seref, S. (2026). *Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach*. MSc Thesis, Jheronimus Academy of Data Science.
