@@ -1,6 +1,6 @@
 # Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach
 
-This repository contains the code and supplementary data for the MSc thesis *"Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach"* (JADS, 2025). The pipeline performs large-scale sentiment analysis and frame detection on a corpus of ~25,000 Dutch newspaper articles from Algemeen Dagblad, De Telegraaf, and de Volkskrant.
+This repository contains the code and supplementary data for the MSc thesis *"Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach"* (Şeref, 2026). The pipeline performs large-scale sentiment analysis and frame detection on a corpus of ~25,000 Dutch newspaper articles from Algemeen Dagblad, De Telegraaf, and de Volkskrant.
 
 ## Research Questions
 
