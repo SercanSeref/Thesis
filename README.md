@@ -48,10 +48,6 @@ This repository contains the code and supplementary data for the MSc thesis *"Un
 3. **Sentiment Analysis** — Zero-shot uniform sentiment classification and aspect-based sentiment analysis (ABSA) by drug class using `MoritzLaurer/mDeBERTa-v3-base-mnli-xnli`
 4. **Sample Analysis** — Comparative outlet analysis, visualisations, and statistical testing
 
-## Data Availability
-
-The newspaper articles were retrieved via LexisNexis Academic under the institutional license of JADS and cannot be publicly shared. The supplementary data files and processed outputs are included where licensing permits. Raw data is available upon reasonable request, subject to LexisNexis terms.
-
 ## Requirements
 
 The pipeline was executed on the TU/e High Performance Computing cluster. Key dependencies include:
