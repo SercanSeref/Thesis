@@ -1,0 +1,267 @@
+---
+output: reprex::reprex_document
+knit: reprex::reprex_render
+---
+
+Download the necessarty packages and set the working directory to where the data is stored.
+
+```{r}
+install.packages("LexisNexisTools")
+install.packages("quanteda.textmodels")
+install.packages("BERTopic")
+install.packages("reticulate")
+```
+
+```{r}
+library("LexisNexisTools")
+setwd("D:/JADS/Thesis/Data")
+```
+ 
+Rename files using info from cover pages
+
+```{r}
+report <- lnt_rename(x = getwd(), report = TRUE, recursive = TRUE)
+```
+
+Read all Lexis files in this folder
+
+```{r}
+LNToutput <- lnt_read(x = getwd(), recursive = TRUE)
+```
+
+Extract data frames
+
+```{r}
+meta_df       <- LNToutput@meta        # one row per article with metadata
+articles_df   <- LNToutput@articles    # article-level text
+paragraphs_df <- LNToutput@paragraphs  # paragraph-level text
+```
+
+## Writing the data to csv files for later use
+
+```{r}
+# Load libraries first
+library(dplyr)
+library(quanteda)
+library(readr)
+
+# Define stopwords once
+my_stop <- c(
+  stopwords("nl"),
+  stopwords("en"),
+  "ık", "ın", "zıjn", "ıs", "wıe", "ıets", "ıemand",
+  "zıch", "dıt", "pagina", "we", "waar", "jaar", "wel"
+)
+
+# Reusable cleaner
+remove_stopwords_text <- function(x, sw) {
+  toks_local <- tokens(
+    x,
+    remove_punct = TRUE,
+    remove_symbols = TRUE,
+    remove_separators = TRUE
+  ) %>%
+    tokens_remove(sw) %>%
+    tokens_remove(pattern = "^[[:punct:]]+$") %>%
+    tokens_remove(pattern = "^[a-z]$")
+  
+  sapply(toks_local, paste, collapse = " ")
+}
+
+# Build corpus_df from all metadata + article text only
+corpus_df <- meta_df %>%
+  left_join(
+    articles_df %>% dplyr::select(ID, Article),
+    by = "ID"
+  ) %>%
+  dplyr::filter(!is.na(Newspaper), !is.na(Date), !is.na(Article)) %>%
+  mutate(Article = remove_stopwords_text(as.character(Article), my_stop))
+
+# Optional: save directly from this canonical block
+readr::write_csv(corpus_df, "D:/JADS/Thesis/corpus_df_processed.csv")
+
+# Create quanteda corpus
+corp <- quanteda::corpus(corpus_df, text_field = "Article")
+quanteda::docvars(corp) <- corpus_df %>% dplyr::select(-Article)
+quanteda::docnames(corp) <- corpus_df$ID
+```
+
+Analyze the Big Data
+
+```{r}
+library(dplyr)
+library(lubridate)
+library(stringr)
+library(ggplot2)
+library(tibble)
+
+year_target <- 2024  # change to 2017 (or any year) when needed
+
+# 1) Quick diagnostic
+cat("Date column class:", class(meta_df$Date), "\n")
+print(head(meta_df$Date, 10))
+
+# 2) Robust date parsing
+date_std <- if (inherits(meta_df$Date, "Date")) {
+  as.Date(meta_df$Date)
+} else {
+  raw_date <- as.character(meta_df$Date) %>%
+    str_squish() %>%
+    str_replace_all(",", "")  # remove all commas
+
+  suppressWarnings(
+    as.Date(
+      parse_date_time(
+        raw_date,
+        orders = c(
+          "Y-m-d", "d-m-Y", "d/m/Y", "m/d/Y", "Ymd",
+          "d b Y", "d B Y", "b d Y", "B d Y", "d-b-Y", "d-B-Y",
+          "Y-m-d H:M:S", "d/m/Y H:M:S", "m/d/Y H:M:S"
+        ),
+        locale = "C"
+      )
+    )
+  )
+}
+
+# 3) Parsing quality
+parse_rate <- round(mean(!is.na(date_std)) * 100, 2)
+cat("Parsed dates:", sum(!is.na(date_std)), "of", length(date_std), "(", parse_rate, "%)\n")
+
+# 4) Month popularity for selected year
+popular_months <- tibble(Date = date_std) %>%
+  filter(!is.na(Date), year(Date) == year_target) %>%
+  mutate(month_num = month(Date)) %>%
+  count(month_num, name = "n") %>%
+  mutate(
+    month = month(month_num, label = TRUE, abbr = FALSE),
+    pct = round(100 * n / sum(n), 2)
+  ) %>%
+  arrange(desc(n), month_num)
+
+if (nrow(popular_months) == 0) {
+  cat("No parsed dates found for year", year_target, "\n")
+} else {
+  print(popular_months)
+
+  # 5) Most popular month(s), including ties
+  top_months <- popular_months %>%
+    filter(n == max(n))
+
+  cat("\nMost popular month(s) in", year_target, ":\n")
+  print(top_months)
+
+  # 6) Bar chart in calendar order
+  plot_df <- popular_months %>%
+    arrange(month_num) %>%
+    mutate(month = factor(as.character(month), levels = as.character(month)))
+
+  ggplot(plot_df, aes(x = month, y = n)) +
+    geom_col(fill = "#2C7FB8") +
+    labs(
+      title = paste("Article count by month (", year_target, ")", sep = ""),
+      x = "Month",
+      y = "Number of articles"
+    ) +
+    theme_minimal(base_size = 12)
+}
+```
+
+Pre-proccessing for NLP analysis
+
+```{r}
+# Load libraries first
+library(dplyr)
+library(quanteda)
+
+# Create corpus_df by combining metadata with article text
+corpus_df <- meta_df %>%
+  left_join(articles_df, by = c("ID" = "ID"))
+
+# Filter for missing values
+corpus_df <- corpus_df %>%
+  dplyr::filter(!is.na(Newspaper), !is.na(Date))
+
+#set.seed(123)  # For reproducibility
+#corpus_df <- corpus_df %>%
+#  slice_sample(n = 2000)
+
+# Create quanteda corpus
+corp <- quanteda::corpus(corpus_df, text_field = "Article")
+
+# Add document variables (metadata)
+quanteda::docvars(corp) <- corpus_df %>% 
+  dplyr::select(-Article)
+
+# Set document names
+quanteda::docnames(corp) <- corpus_df$ID
+```
+
+Tokenization
+
+```{r}
+docnames(corp) <- rownames(corpus_df)
+
+my_stop <- c(
+  stopwords("nl"),
+  stopwords("en"),
+  "ık", "ın", "zıjn", "ıs", "wıe", "ıets", "ıemand",
+  "zıch", "dıt", "pagina", "we", "waar", "jaar", "wel"
+)
+
+# Tokenize with punctuation/symbol removal
+toks <- tokens(corp,
+               remove_punct   = TRUE,
+               remove_symbols = TRUE,
+               remove_separators = TRUE) %>%
+  tokens_remove(my_stop) %>%
+  tokens_remove(pattern = "^[[:punct:]]+$") %>%
+  tokens_remove(pattern = "^[a-z]$")  # Remove single letters
+```
+
+Save the processed corpus for later use in topic modelling and supervised models.  
+
+```{r}
+readr::write_csv(corpus_df, "D:/JADS/Thesis/corpus_df_processed.csv")
+``` 
+
+Then, we create a document-feature matrix (DFM) -- a base for topic models and supervised models.
+
+```{r}
+dfmat <- dfm(toks) %>%
+  dfm_trim(min_termfreq = 10, min_docfreq = 5)
+``` 
+
+## Structured topic modelling
+
+We use topic modelling to discover themes.
+
+```{r}
+library(stm)
+
+stm_in   <- quanteda::convert(dfmat, to = "stm")
+stm_meta <- quanteda::docvars(corp)[quanteda::docnames(dfmat), , drop = FALSE] %>%
+  as.data.frame()
+
+# keep date numeric for s(Date)
+stm_meta$Date <- as.numeric(as.Date(stm_meta$Date))
+
+stopifnot(length(stm_in$documents) == nrow(stm_meta))
+
+mod <- stm::stm(
+  documents  = stm_in$documents,
+  vocab      = stm_in$vocab,
+  K          = 20,
+  prevalence = ~ Newspaper * s(Date),
+  data       = stm_meta,
+  init.type  = "Spectral"
+)
+```
+
+Inspect the top words in the first 5 topics
+
+```{r}
+labelTopics(mod, topics = 1:5)
+````
+
+Topic distribution by newspaper
