@@ -73,4 +73,4 @@ The pipeline was executed on the TU/e High Performance Computing cluster. Key de
 
 If you use this code, please cite the thesis:
 
-> Seref, S. (2025). *Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach*. MSc Thesis, Jheronimus Academy of Data Science.
+> Seref, S. (2026). *Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach*. MSc Thesis, Jheronimus Academy of Data Science.
