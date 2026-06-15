@@ -1,6 +1,6 @@
 # Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach
 
-This repository contains the code and supplementary data for the MSc thesis *"Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach"* (Şeref, 2026). The pipeline performs large-scale sentiment analysis and frame detection on a corpus of ~25,000 Dutch newspaper articles from Algemeen Dagblad, De Telegraaf, and de Volkskrant.
+This repository contains the code and supplementary data for the MSc thesis *"Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach"* (JADS, 2025). The pipeline performs large-scale sentiment analysis and frame detection on a corpus of ~25,000 Dutch newspaper articles from Algemeen Dagblad, De Telegraaf, and de Volkskrant.
 
 ## Research Questions
 
@@ -28,16 +28,10 @@ This repository contains the code and supplementary data for the MSc thesis *"Un
 ├── Output/                           # Generated figures and plots
 │
 └── Data/                             # Processed data files (see note below)
-    ├── corpus_df.csv                 # Raw corpus
-    ├── corpus_df_cleaned.csv         # After cleaning
-    ├── corpus_df_processed.csv       # After preprocessing
-    ├── df_zondertips.csv             # Filtered corpus
-    ├── df_with_topics.csv            # Corpus with BERTopic assignments
-    ├── uniform_sentiment_analysis.csv
-    ├── paragraphs_processed.csv
-    ├── aspect_sentiment_by_drugclass.csv
-    ├── aspect_sentiment_paragraphs.csv
-    └── comparison_sample.csv
+    ├── df_with_topics.csv            # Topic assignments per article (text columns removed)
+    ├── uniform_sentiment_analysis.csv # Sentiment scores per article (text columns removed)
+    ├── aspect_sentiment_by_drugclass.csv # ABSA scores per drug class (text columns removed)
+    └── comparison_sample.csv         # Comparative outlet analysis output
 ```
 
 ## Pipeline Overview
@@ -47,6 +41,12 @@ This repository contains the code and supplementary data for the MSc thesis *"Un
 2. **BERTopic** — Contextual embeddings via `LoicDL/NewsBERTje-base`, topic modeling with hyperparameter tuning, topics over time, and manual frame interpretation into four categories
 3. **Sentiment Analysis** — Zero-shot uniform sentiment classification and aspect-based sentiment analysis (ABSA) by drug class using `MoritzLaurer/mDeBERTa-v3-base-mnli-xnli`
 4. **Sample Analysis** — Comparative outlet analysis, visualisations, and statistical testing
+
+## Data Availability
+
+The newspaper articles were retrieved via LexisNexis Academic under the institutional license of JADS. Due to LexisNexis licensing terms, raw article text cannot be publicly shared. The following files are therefore excluded from this repository: corpus_df.csv, corpus_df_cleaned.csv, corpus_df_processed.csv, df_zondertips.csv, paragraphs_processed.csv, and aspect_sentiment_paragraphs.csv.
+
+Processed output files with raw text columns removed are included in the Data/ folder. All supplementary data files are included in full. Raw data is available upon reasonable request, subject to LexisNexis terms.
 
 ## Requirements
 
@@ -69,4 +69,4 @@ The pipeline was executed on the TU/e High Performance Computing cluster. Key de
 
 If you use this code, please cite the thesis:
 
-> Seref, S. (2026). *Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach*. MSc Thesis, Jheronimus Academy of Data Science.
+> Seref, S. (2025). *Uncovering Trends in Illicit Drug Reporting in Dutch News Media: A Data-Driven Approach*. MSc Thesis, Jheronimus Academy of Data Science.
